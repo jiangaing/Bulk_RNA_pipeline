@@ -18,14 +18,14 @@
 
 - **MergeCount**: Merge the individual count files as one matrix file
 
-- ## Inputs
+## Inputs
   
 The main inputs to the workflow are:
 
 - **raw_fastqc**: Input aligned file in fastqc format.
 - **raw_annotated_reference**: Human reference genome .gff file (General Feature Format). The version being used is GRCh38 release110 ([source](https://ftp.ensembl.org/pub/release-110/gff3/homo_sapiens/Homo_sapiens.GRCh38.110.gff3.gz)).
 
-- ## Outputs
+## Outputs
 
 The main output files are listed below:
 
