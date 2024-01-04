@@ -22,7 +22,7 @@
   
 The main inputs to the workflow are:
 
-- **raw_fastqc**: Input aligned file in .bam format.
+- **raw_fastqc**: Input aligned file in fastqc format.
 - **raw_annotated_reference**: Human reference genome .gff file (General Feature Format). The version being used is GRCh38 release110 ([source](https://ftp.ensembl.org/pub/release-110/gff3/homo_sapiens/Homo_sapiens.GRCh38.110.gff3.gz)).
 
 - ## Outputs
@@ -31,8 +31,8 @@ The main output files are listed below:
 
 - **SortBam**:
   - `sorted_bam` :Sorted bam file
-- **FeatureCount**:
-   - `raw_count_file`: Text file containing raw gene expression count
+- **MergeCount**:
+   - `merge_count_file`: Text file containing raw gene expression count from all input samples
  
 ## Components
 
