@@ -3,13 +3,13 @@ version 1.0
 task pre_qc {
     
     input {
-        File read1_raw
-        File read2_raw
+        File read1
+        File read2
         String file_label
     }  
     command <<<
-        fastqc -o . ~{read1_raw} 
-        fastqc -o . ~{read2_raw}
+        fastqc -o . ~{read1} 
+        fastqc -o . ~{read2}
     >>>
 
     output {

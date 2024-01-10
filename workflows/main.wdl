@@ -19,7 +19,6 @@ workflow main {
         Int? trimmomatic_minlen = 75
         Int? trimmomatic_window_size=4
         Int? trimmomatic_quality_trim_score=30
-        String? trimmomatic_args
         File reference_genome
     }
 
@@ -29,31 +28,29 @@ workflow main {
         prefix : "Sample name"
     }
 
-
-    call QC.pre_qc {
+    call Qc.pre_qc {
         input: 
-            read1 = read1_raw
-            read2 = read2_raw
+            read1 = read1_raw,
+            read2 = read2_raw,
             file_label = prefix
     }
 
     call Trim.trim_read {
         input: 
-            read1 = read1_raw
-            read2 = read2_raw
-            file_label = prefix
-            trimmomatic_minlen = trimmomatic_minlen
-            trimmomatic_window_size = trimmomatic_window_size
-            trimmomatic_quality_trim_score = trimmomatic_quality_trim_score
-            trimmomatic_args = trim_args
+            read1 = read1_raw,
+            read2 = read2_raw,
+            file_label = prefix,
+            trimmomatic_minlen = trimmomatic_minlen,
+            trimmomatic_window_size = trimmomatic_window_size,
+            trimmomatic_quality_trim_score = trimmomatic_quality_trim_score,
     }
 
 call Align.map_read {
         input: 
-            read1 = read1_raw
-            read2 = read2_raw
-            file_label = prefix
-            reference_genome = reference_genome_map
+            read1 = read1_raw,
+            read2 = read2_raw,
+            file_label = prefix,
+            reference_genome_map = reference_genome
     }
 
     call Count.feature_count {
@@ -65,7 +62,7 @@ call Align.map_read {
 
     call Merge.merge_count {
         input: 
-            raw_fastq = raw_bam_file, 
+            count_files = feature_count.count_file,
             file_label = prefix
     }
 

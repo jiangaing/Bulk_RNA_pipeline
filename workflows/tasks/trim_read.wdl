@@ -9,7 +9,6 @@ task trim_read {
         Int? trimmomatic_minlen = 75
         Int? trimmomatic_window_size=4
         Int? trimmomatic_quality_trim_score=30
-        String? trimmomatic_args
     }
     command <<<
     # date and version control
@@ -17,7 +16,6 @@ task trim_read {
         trimmomatic -version > VERSION && sed -i -e 's/^/Trimmomatic /' VERSION
 
     trimmomatic PE \
-        ~{trimmomatic_args} \
         ~{read1} ~{read2} \
         -baseout ~{file_label}.fastq.gz \
         SLIDINGWINDOW:~{trimmomatic_window_size}:~{trimmomatic_quality_trim_score} \
@@ -26,9 +24,9 @@ task trim_read {
     >>>
 
     output {
-        File read1_trimmed = "~{prefix}_trimmed_1P.fastq.gz"
-        File read2_trimmed = "~{prefix}_trimmed_2P.fastq.gz"
-        File trimmomatic_stats = "~{prefix}.trim.stats.txt"
+        File read1_trimmed = "~{file_label}_trimmed_1P.fastq.gz"
+        File read2_trimmed = "~{file_label}_trimmed_2P.fastq.gz"
+        File trimmomatic_stats = "~{file_label}.trim.stats.txt"
     }
 
     runtime {

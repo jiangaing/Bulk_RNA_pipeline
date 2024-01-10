@@ -1,16 +1,19 @@
+version 1.0
+
 task merge_count {
     # This concatenates the featureCounts count files into a 
     # raw count matrix.
-
-    Array[File] count_files
-    String prefix
+    input {
+        File count_files
+        String file_label
+    }
 
     command <<<
         concatenate_featurecounts.py -o ${output_filename} ${sep=" " count_files}
     >>>
 
     output {
-        File count_matrix = "${prefix}"
+        File count_matrix = "${file_label}"
     }
 
     runtime {
