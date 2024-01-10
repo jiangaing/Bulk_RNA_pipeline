@@ -9,7 +9,7 @@ import "./tasks/merge_count.wdl" as Merge
 workflow main {
 
     String pipeline_version = "1.0"
-    String container_src = "ghcr.io/jiangaing/Terra_test/container~{pipeline_version}"
+    String container_src = "ghcr.io/jiangaing/Bulk_RNA_pipeline/container~{pipeline_version}"
     
     input {
         File raw_annotated_reference
