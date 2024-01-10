@@ -1,0 +1,9 @@
+{
+  "trimmomatic_minlen": "75",
+  "read1": "/Users/jiangc/Downloads/Sample_002_END1.fastq.gz",
+  "trimmomatic_quality_trim_score": "30",
+  "file_label": "Sample_002",
+  "trimmomatic_args": "",
+  "read2": "/Users/jiangc/Downloads/Sample_002_END2.fastq.gz",
+  "trimmomatic_window_size": "4"
+}

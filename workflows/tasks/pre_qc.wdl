@@ -1,13 +1,15 @@
 version 1.0
 
-task QC {
+task pre_qc {
     
     input {
-         raw_fastq
+        File read1_raw
+        File read2_raw
         String file_label
     }  
     command <<<
-        fastqc -o . ~{raw_fastq} 
+        fastqc -o . ~{read1_raw} 
+        fastqc -o . ~{read2_raw}
     >>>
 
     output {

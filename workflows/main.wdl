@@ -1,11 +1,10 @@
 version 1.0
 
-import "./tasks/pre_qc.wdl" as QC
+import "./tasks/pre_qc.wdl" as Qc
 import "./tasks/trim_read.wdl" as Trim
 import "./tasks/map_read.wdl" as Align
-import "./tasks/bam_sort.wdl" as sort
-import "./tasks/feature_count.wdl" as count
-import "./tasks/merge_count.wdl" as merge
+import "./tasks/feature_count.wdl" as Count
+import "./tasks/merge_count.wdl" as Merge
 
 workflow main {
 
@@ -13,9 +12,15 @@ workflow main {
     String container_src = "ghcr.io/jiangaing/Terra_test/container~{pipeline_version}"
     
     input {
-        File raw_bam_file
         File raw_annotated_reference
         String prefix
+        File read1_raw 
+        File read2_raw
+        Int? trimmomatic_minlen = 75
+        Int? trimmomatic_window_size=4
+        Int? trimmomatic_quality_trim_score=30
+        String? trimmomatic_args
+        File reference_genome
     }
 
     parameter_meta {
@@ -24,25 +29,56 @@ workflow main {
         prefix : "Sample name"
     }
 
- call sort.SortBam {
-        input: raw_fastq = raw_bam_file, file_label = prefix
+
+    call QC.pre_qc {
+        input: 
+            read1 = read1_raw
+            read2 = read2_raw
+            file_label = prefix
     }
 
-
-
-
-
-    call sort.SortBam {
-        input: bam_file = raw_bam_file, file_label = prefix
+    call Trim.trim_read {
+        input: 
+            read1 = read1_raw
+            read2 = read2_raw
+            file_label = prefix
+            trimmomatic_minlen = trimmomatic_minlen
+            trimmomatic_window_size = trimmomatic_window_size
+            trimmomatic_quality_trim_score = trimmomatic_quality_trim_score
+            trimmomatic_args = trim_args
     }
 
-    call count.FeatureCount {
-        input:  sorted_bam = SortBam.sorted_bam ,annotated_reference = raw_annotated_reference, file_label = prefix
+call Align.map_read {
+        input: 
+            read1 = read1_raw
+            read2 = read2_raw
+            file_label = prefix
+            reference_genome = reference_genome_map
+    }
+
+    call Count.feature_count {
+        input:  
+            sorted_bam = map_read.sorted_bam,
+            annotated_reference = raw_annotated_reference, 
+            file_label = prefix
+    }
+
+    call Merge.merge_count {
+        input: 
+            raw_fastq = raw_bam_file, 
+            file_label = prefix
     }
 
     output {
-        File sorted_bam = SortBam.sorted_bam
-        File raw_count_file = FeatureCount.count_file
+        File qc_report = pre_qc.qc_report
+        File qc_report_zip = pre_qc.qc_report_zip
+        File read1_trimmed = trim_read.read1_trimmed
+        File read2_trimmed = trim_read.read2_trimmed
+        File trimmomatic_stats = trim_read.trimmomatic_stats
+        File sorted_bam = map_read.sorted_bam
+        File sorted_bai = map_read.sorted_bai
+        File count_file_raw = feature_count.count_file
+        File count_matrix = merge_count.count_matrix
     }
 
     meta {

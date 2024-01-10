@@ -1,0 +1,7 @@
+{
+  "read1": "/Users/jiangc/Downloads/Sample_002_END1.fastq.gz",
+  "reference_genome_map": "/Users/jiangc/Downloads/Homo_sapiens_assembly38.fasta",
+  "file_label": "Sample_002",
+  "read2": "/Users/jiangc/Downloads/Sample_002_END2.fastq.gz"
+}
+

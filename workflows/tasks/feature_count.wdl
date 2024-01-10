@@ -1,6 +1,6 @@
 version 1.0
 
-task FeatureCount {
+task feature_count {
     
     input {
         File sorted_bam

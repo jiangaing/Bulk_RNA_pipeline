@@ -1,26 +1,39 @@
 version 1.0
 
-task QC {
-    
+task trim_read {
+
     input {
-        File raw_fastq
+        File read1
+        File read2
         String file_label
-    }  
+        Int? trimmomatic_minlen = 75
+        Int? trimmomatic_window_size=4
+        Int? trimmomatic_quality_trim_score=30
+        String? trimmomatic_args
+    }
     command <<<
-        trimmomatic PE  SRR_1056_1.fastq SRR_1056_2.fastq
-              SRR_1056_1.trimmed.fastq SRR_1056_1un.trimmed.fastq \
-              SRR_1056_2.trimmed.fastq SRR_1056_2un.trimmed.fastq \
-              ILLUMINACLIP:SRR_adapters.fa SLIDINGWINDOW:4:20
+    # date and version control
+        date | tee DATE
+        trimmomatic -version > VERSION && sed -i -e 's/^/Trimmomatic /' VERSION
+
+    trimmomatic PE \
+        ~{trimmomatic_args} \
+        ~{read1} ~{read2} \
+        -baseout ~{file_label}.fastq.gz \
+        SLIDINGWINDOW:~{trimmomatic_window_size}:~{trimmomatic_quality_trim_score} \
+        MINLEN:~{trimmomatic_minlen} &> ~{file_label}.trim.stats.txt
+
     >>>
 
     output {
-        File qc_report = file_label + "_fastqc.html"
-        File qc_report_zip = file_label + "_fastqc.zip"
+        File read1_trimmed = "~{prefix}_trimmed_1P.fastq.gz"
+        File read2_trimmed = "~{prefix}_trimmed_2P.fastq.gz"
+        File trimmomatic_stats = "~{prefix}.trim.stats.txt"
     }
-    
+
     runtime {
         docker: "staphb/trimmomatic"
-        memory: "64G"
+        memory: "32G"
         disks: "local-disk 40 HDD"
     }
 }
