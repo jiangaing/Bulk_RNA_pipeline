@@ -47,8 +47,8 @@ workflow main {
 
 call Align.map_read {
         input: 
-            read1 = read1_trimmed,
-            read2 = read2_trimmed,
+            read1 = trim_read.read1_trimmed,
+            read2 = trim_read.read2_trimmed,
             file_label = prefix,
             reference_genome_map = reference_genome
     }
