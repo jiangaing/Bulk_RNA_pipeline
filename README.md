@@ -1,4 +1,5 @@
 # Bulk_RNA_pipeline
+[![Open](https://img.shields.io/badge/Open-Dockstore-blue)](https://dockstore.org/my-workflows/github.com/jiangaing/Bulk_RNA_pipeline:main?tab=info)
 
 > [!TIP]
 > To import the workflow into your Terra workspace, click on the above Dockstore badge, and select 'Terra' from the 'Launch with' widget on the Dockstore workflow page.
@@ -6,9 +7,9 @@
 
 ## Workflow Steps
 
-- **PRE_QC**: Quality check of the sequencing reads
+- **PRE_QC**: Quality check of the raw sequencing reads. 
   
-- **Trim**: Remove the low quality reads or sequecning adapterusing `bwa
+- **Trim**: Remove the low quality reads or sequecning adapter using `bwa
 
 - **Align**: Mapping the post QC reads to a given reference genome using `trimmomatic`. The output is sorted bam file with index file (.bai)
 
@@ -20,7 +21,7 @@
   
 The main inputs to the workflow are:
 
-- **raw_fastqc**: Input aligned file in fastqc format.
+- **raw_fastqc**: Input file in fastq format.
 - **raw_annotated_reference**: Human reference genome .gff file (General Feature Format). The version being used is GRCh38 release110 ([source](https://ftp.ensembl.org/pub/release-110/gff3/homo_sapiens/Homo_sapiens.GRCh38.110.gff3.gz)).
 - **reference_genome**: Human reference genome .fasta file. The version being used is GRCh38 release110 ([source](https://ftp.ensembl.org/pub/release-110/fasta/Homo_sapiens.GRCh38.dna_sm.toplevel.fa.gz))
 
@@ -40,12 +41,12 @@ The main output files are listed below:
 
 ## Components
 
-
 - **Tools**
   - trimmomatic
   - bwa
   - samtools
   - featureCounts
+
 - **Containers**
   - pegi3s/samtools_bcftools
   - pegi3s/feature-counts
