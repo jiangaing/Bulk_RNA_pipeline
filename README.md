@@ -1,4 +1,6 @@
 # Bulk_RNA_pipeline
+![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/anand-imcm/pb-variant-call/publish.yml)&nbsp;&nbsp;
+![GitHub release (with filter)](https://img.shields.io/github/v/release/anand-imcm/pb-variant-call)&nbsp;&nbsp;
 [![Open](https://img.shields.io/badge/Open-Dockstore-blue)](https://dockstore.org/my-workflows/github.com/jiangaing/Bulk_RNA_pipeline:main?tab=info)
 
 > [!TIP]
