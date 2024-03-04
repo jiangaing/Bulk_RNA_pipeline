@@ -24,8 +24,8 @@ task trim_read {
     >>>
 
     output {
-        File read1_trimmed = "~{file_label}_trimmed_1P.fastq.gz"
-        File read2_trimmed = "~{file_label}_trimmed_2P.fastq.gz"
+        File read1_trimmed = "~{file_label}_1P.fastq.gz"
+        File read2_trimmed = "~{file_label}_2P.fastq.gz"
         File trimmomatic_stats = "~{file_label}.trim.stats.txt"
     }
 
