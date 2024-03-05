@@ -12,7 +12,7 @@ workflow main {
         Array[String] sample_names
         File reference_genome
         File annotated_reference
-        String adapters_path
+        File adapters_path
     }
 
     # Quality Control (QC) with fastqc
