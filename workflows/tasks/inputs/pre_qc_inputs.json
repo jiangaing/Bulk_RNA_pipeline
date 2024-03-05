@@ -1,0 +1,5 @@
+{
+  "read2_files": ["/Users/jiangc/Desktop/Terra_test/Terra_test/test_fastqc/sample_001_p2_fastq.gz", "/Users/jiangc/Desktop/Terra_test/Terra_test/test_fastqc/sample_002_p2_fastq.gz"],
+  "sample_names": ["Sample1", "Sample2"],
+  "read1_files": ["/Users/jiangc/Desktop/Terra_test/Terra_test/test_fastqc/sample_001_p1_fastq.gz","/Users/jiangc/Desktop/Terra_test/Terra_test/test_fastqc/sample_002_p1_fastq.gz"]
+}

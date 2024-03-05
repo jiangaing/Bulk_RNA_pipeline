@@ -1,37 +1,34 @@
 version 1.0
 
 task trim_read {
-
     input {
-        File read1
-        File read2
-        String file_label
-        Int? trimmomatic_minlen = 75
-        Int? trimmomatic_window_size=4
-        Int? trimmomatic_quality_trim_score=30
+        Array[File] read1_files
+        Array[File] read2_files
+        Array[String] sample_names
+        String adapters_path
+        Int minlen = 75
     }
+
     command <<<
-    # date and version control
-        date | tee DATE
-        trimmomatic -version > VERSION && sed -i -e 's/^/Trimmomatic /' VERSION
-
-    trimmomatic PE \
-        ~{read1} ~{read2} \
-        -baseout ~{file_label}.fastq.gz \
-        SLIDINGWINDOW:~{trimmomatic_window_size}:~{trimmomatic_quality_trim_score} \
-        MINLEN:~{trimmomatic_minlen} &> ~{file_label}.trim.stats.txt
-
+        mkdir trimmed_reads
+        for i in ${seq 0 $((${read1_files[@]} - 1))}
+        do
+            trimmomatic PE -threads 4 \
+            ${read1_files[i]} ${read2_files[i]} \
+            trimmed_reads/"${sample_names[i]}_R1_paired.fastq.gz" trimmed_reads/"${sample_names[i]}_R1_unpaired.fastq.gz" \
+            trimmed_reads/"${sample_names[i]}_R2_paired.fastq.gz" trimmed_reads/"${sample_names[i]}_R2_unpaired.fastq.gz" \
+            ILLUMINACLIP:${adapters_path}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:${minlen} MINLEN:${minlen}
+        done
     >>>
 
     output {
-        File read1_trimmed = "~{file_label}_1P.fastq.gz"
-        File read2_trimmed = "~{file_label}_2P.fastq.gz"
-        File trimmomatic_stats = "~{file_label}.trim.stats.txt"
+        Array[File] r1_paired = glob("trimmed_reads/*_R1_paired.fastq.gz")
+        Array[File] r2_paired = glob("trimmed_reads/*_R2_paired.fastq.gz")
     }
 
     runtime {
-        docker: "staphb/trimmomatic"
-        memory: "32G"
-        disks: "local-disk 40 HDD"
+        docker: "biocontainers/trimmomatic"
+        memory: "16 GB"
+        cpu: "4"
     }
 }

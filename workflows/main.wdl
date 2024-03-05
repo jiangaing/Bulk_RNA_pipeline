@@ -1,92 +1,61 @@
-version 2.0
+version 1.0
 
 import "./tasks/pre_qc.wdl" as Qc
 import "./tasks/trim_read.wdl" as Trim
 import "./tasks/map_read.wdl" as Align
 import "./tasks/feature_count.wdl" as Count
-import "./tasks/merge_count.wdl" as Merge
 
 workflow main {
-    String pipeline_version = "2.0"
-    String container_src = "ghcr.io/jiangaing/Bulk_RNA_pipeline/container~{pipeline_version}"
-    
     input {
-        File raw_annotated_reference
-        String prefix
-        File read1_raw 
-        File read2_raw
-        Int? trimmomatic_minlen = 75
-        Int? trimmomatic_window_size=4
-        Int? trimmomatic_quality_trim_score=30
+        Array[File] fastq_end1_files
+        Array[File] fastq_end2_files
+        Array[String] sample_names
         File reference_genome
-        
-        Array[File] read1_raw
-        Array[File] read2_raw
-        Array[Pair[File, File]] fastq_pairs = zip(read1_raw, read2_raw)
+        File annotated_reference
+        String adapters_path
     }
 
-    parameter_meta {
-        bam_file : "bam file"
-        annotated_reference : "mapping reference as bed file"
-        prefix : "Sample name"
+    # Quality Control (QC) with fastqc
+    call Qc.pre_qc {
+        input:
+            read1_files = fastq_end1_files,
+            read2_files = fastq_end2_files,
+            sample_names = sample_names
     }
 
-    scatter(item in fastq_pairs){
-        call Qc.pre_qc {
-            input: 
-                read1 = read1_raw,
-                read2 = read2_raw,
-                file_label = prefix
-        }
-
-        call Trim.trim_read {
-            input: 
-                read1 = read1_raw,
-                read2 = read2_raw,
-                file_label = prefix,
-                trimmomatic_minlen = trimmomatic_minlen,
-                trimmomatic_window_size = trimmomatic_window_size,
-                trimmomatic_quality_trim_score = trimmomatic_quality_trim_score,
-        }
-
-        call Align.map_read {
-            input: 
-                read1 = trim_read.read1_trimmed,
-                read2 = trim_read.read2_trimmed,
-                file_label = prefix,
-                reference_genome_map = reference_genome
-        }
-
-        call Count.feature_count {
-            input:  
-                sorted_bam = map_read.sorted_bam,
-                annotated_reference = raw_annotated_reference, 
-                file_label = prefix
-        }
+    # Read Trimming with trimmomatic
+    call Trim.trim_read {
+        input:
+            read1_files = fastq_end1_files,
+            read2_files = fastq_end2_files,
+            sample_names = sample_names,
+            adapters_path = adapters_path
     }
 
-    call Merge.merge_count {
-        input: 
-            count_files = feature_count.count_file,
-            file_label = prefix
+    # Read Mapping with bwa
+    call Align.map_read {
+        input:
+            read1_files = Trim.r1_paired,
+            read2_files = Trim.r2_paired,
+            sample_names = sample_names,
+            reference_genome = reference_genome
     }
 
+    # Feature Counting with featureCounts
+    call Count.feature_count {
+        input:
+            sorted_bams = Align.sorted_bams,
+            sample_names = sample_names,
+            annotated_reference = annotated_reference
+    }
+
+    # Outputs
     output {
-        Array[File] qc_report = pre_qc.qc_report
-        Array[File] qc_report_zip = pre_qc.qc_report_zip
-        Array[File] read1_trimmed = trim_read.read1_trimmed
-        Array[File] read2_trimmed = trim_read.read2_trimmed
-        Array[File] trimmomatic_stats = trim_read.trimmomatic_stats
-        Array[File] sorted_bam = map_read.sorted_bam
-        Array[File] sorted_bai = map_read.sorted_bai
-        Array[File] count_file_raw = feature_count.count_file
-        File count_matrix = merge_count.count_matrix
+        Array[File] qc_report_htmls = Qc.qc_report_htmls
+        Array[File] qc_report_zips = Qc.qc_report_zips
+        Array[File] trimmed_reads_r1 = Trim.r1_paired
+        Array[File] trimmed_reads_r2 = Trim.r2_paired
+        Array[File] mapped_bams = Align.sorted_bams
+        Array[File] count_files = Count.count_files
     }
-
-    meta {
-        description: "A WDL-based workflow for analyzing bulk RNA-seq data"
-        author: "Chang"
-        email: "jiang.chang@well.ox.ac.uk"
-    }
-
 }
