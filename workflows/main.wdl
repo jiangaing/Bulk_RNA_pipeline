@@ -35,8 +35,8 @@ workflow main {
     # Read Mapping with bwa
     call Align.map_read {
         input:
-            read1_files = Trim.r1_paired,
-            read2_files = Trim.r2_paired,
+            read1_files = trim_read.r1_paired,
+            read2_files = trim_read.r2_paired,
             sample_names = sample_names,
             reference_genome = reference_genome
     }
@@ -44,18 +44,18 @@ workflow main {
     # Feature Counting with featureCounts
     call Count.feature_count {
         input:
-            sorted_bams = Align.sorted_bams,
+            sorted_bams = map_read.sorted_bams,
             sample_names = sample_names,
             annotated_reference = annotated_reference
     }
 
     # Outputs
     output {
-        Array[File] qc_report_htmls = Qc.qc_report_htmls
-        Array[File] qc_report_zips = Qc.qc_report_zips
-        Array[File] trimmed_reads_r1 = Trim.r1_paired
-        Array[File] trimmed_reads_r2 = Trim.r2_paired
-        Array[File] mapped_bams = Align.sorted_bams
-        Array[File] count_files = Count.count_files
+        Array[File] qc_report_htmls = pre_qc.qc_report_htmls
+        Array[File] qc_report_zips = pre_qc.qc_report_zips
+        Array[File] trimmed_reads_r1 = trim_read.r1_paired
+        Array[File] trimmed_reads_r2 = trim_read.r2_paired
+        Array[File] mapped_bams = map_read.sorted_bams
+        Array[File] count_files = feature_count.count_files
     }
 }
