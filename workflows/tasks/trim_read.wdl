@@ -27,7 +27,7 @@ task trim_read {
     }
 
     runtime {
-        docker: "biocontainers/trimmomatic"
+        docker: "staphb/trimmomatic"
         memory: "16 GB"
         cpu: "4"
     }
