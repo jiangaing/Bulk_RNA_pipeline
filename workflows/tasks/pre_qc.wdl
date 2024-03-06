@@ -10,7 +10,7 @@ task pre_qc {
     command <<<
         set -e
         mkdir qc_reports
-        for i in ${seq 0 $(${#read1_files[@]} - 1))}
+        for i in $(seq 0 $((${#read1_files[@]} - 1)))
         do
             fastqc -o qc_reports "${read1_files[i]}" "${read2_files[i]}" -f fastq
             mv qc_reports/* "${sample_names[i]}_R1_fastqc.html"

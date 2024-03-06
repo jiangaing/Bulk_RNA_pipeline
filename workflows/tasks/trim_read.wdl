@@ -11,7 +11,7 @@ task trim_read {
 
     command <<<
         mkdir trimmed_reads
-        for i in ${seq 0 $((${read1_files[@]} - 1))}
+        for i in $(seq 0 $((${#read1_files[@]} - 1)))
         do
             trimmomatic PE -threads 4 \
             ${read1_files[i]} ${read2_files[i]} \

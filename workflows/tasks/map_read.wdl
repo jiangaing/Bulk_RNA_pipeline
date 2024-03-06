@@ -10,7 +10,7 @@ task map_read {
 
     command <<<
         mkdir mapped_reads
-        for i in ${seq 0 $((${read1_files[@]} - 1))}
+        for i in $(seq 0 $((${#read1_files[@]} - 1)))
         do
             bwa mem -t 4 ${reference_genome} ${read1_files[i]} ${read2_files[i]} | \
             samtools sort -o mapped_reads/"${sample_names[i]}_sorted.bam"
