@@ -21,7 +21,7 @@ task feature_count {
     }
 
     runtime {
-        docker: "subread"
+        docker: "pegi3s/feature-counts"
         memory: "16 GB"
         cpu: "4"
     }

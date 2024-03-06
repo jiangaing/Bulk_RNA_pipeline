@@ -23,7 +23,7 @@ task map_read {
     }
 
     runtime {
-        docker: "biocontainers/bwa-samtools"
+        docker: "dukegcb/bwa-samtools"
         memory: "32 GB"
         cpu: "4"
     }
