@@ -4,84 +4,58 @@ import "./tasks/pre_qc.wdl" as Qc
 import "./tasks/trim_read.wdl" as Trim
 import "./tasks/map_read.wdl" as Align
 import "./tasks/feature_count.wdl" as Count
-import "./tasks/merge_count.wdl" as Merge
 
 workflow main {
-
-    String pipeline_version = "1.0"
-    String container_src = "ghcr.io/jiangaing/Bulk_RNA_pipeline/container~{pipeline_version}"
-    
     input {
-        File raw_annotated_reference
-        String prefix
-        File read1_raw 
-        File read2_raw
-        Int? trimmomatic_minlen = 75
-        Int? trimmomatic_window_size=4
-        Int? trimmomatic_quality_trim_score=30
+        File fastq_end1_files
+        File fastq_end2_files
+        String sample_names
         File reference_genome
+        File annotated_reference
+        File adapters_path
     }
 
-    parameter_meta {
-        bam_file : "bam file"
-        annotated_reference : "mapping reference as bed file"
-        prefix : "Sample name"
-    }
-
+    # Quality Control (QC) with fastqc
     call Qc.pre_qc {
-        input: 
-            read1 = read1_raw,
-            read2 = read2_raw,
-            file_label = prefix
+        input:
+            read1_files = fastq_end1_files,
+            read2_files = fastq_end2_files,
+            sample_names = sample_names
     }
 
+    # Read Trimming with trimmomatic
     call Trim.trim_read {
-        input: 
-            read1 = read1_raw,
-            read2 = read2_raw,
-            file_label = prefix,
-            trimmomatic_minlen = trimmomatic_minlen,
-            trimmomatic_window_size = trimmomatic_window_size,
-            trimmomatic_quality_trim_score = trimmomatic_quality_trim_score,
+        input:
+            read1_files = fastq_end1_files,
+            read2_files = fastq_end2_files,
+            sample_names = sample_names,
+            adapters_path = adapters_path
     }
 
-call Align.map_read {
-        input: 
-            read1 = trim_read.read1_trimmed,
-            read2 = trim_read.read2_trimmed,
-            file_label = prefix,
-            reference_genome_map = reference_genome
+    # Read Mapping with bwa
+    call Align.map_read {
+        input:
+            read1_files = trim_read.r1_paired,
+            read2_files = trim_read.r2_paired,
+            sample_names = sample_names,
+            reference_genome = reference_genome
     }
 
+    # Feature Counting with featureCounts
     call Count.feature_count {
-        input:  
-            sorted_bam = map_read.sorted_bam,
-            annotated_reference = raw_annotated_reference, 
-            file_label = prefix
+        input:
+            sorted_bams = map_read.sorted_bams,
+            sample_names = sample_names,
+            annotated_reference = annotated_reference
     }
 
-    call Merge.merge_count {
-        input: 
-            count_files = feature_count.count_file,
-            file_label = prefix
-    }
-
+    # Outputs
     output {
-        File qc_report = pre_qc.qc_report
-        File qc_report_zip = pre_qc.qc_report_zip
-        File read1_trimmed = trim_read.read1_trimmed
-        File read2_trimmed = trim_read.read2_trimmed
-        File trimmomatic_stats = trim_read.trimmomatic_stats
-        File sorted_bam = map_read.sorted_bam
-        File sorted_bai = map_read.sorted_bai
-        File count_file_raw = feature_count.count_file
-        File count_matrix = merge_count.count_matrix
+        File qc_report_htmls = pre_qc.qc_report_htmls
+        File qc_report_zips = pre_qc.qc_report_zips
+        File trimmed_reads_r1 = trim_read.r1_paired
+        File trimmed_reads_r2 = trim_read.r2_paired
+        File mapped_bams = map_read.sorted_bams
+        File count_files = feature_count.count_files
     }
-
-    meta {
-        description: "A WDL-based workflow for analyzing bulk RNA-seq data"
-        author: "Chang"
-        email: "jiang.chang@well.ox.ac.uk"
-    }
-
 }

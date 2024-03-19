@@ -2,36 +2,29 @@ version 1.0
 
 task map_read {
     input {
-        File read1
-        File read2
-        String file_label
-        File reference_genome_map
+        Array[File] read1_files
+        Array[File] read2_files
+        Array[String] sample_names
+        File reference_genome
     }
+
     command <<<
-    # date and version control
-        date | tee DATE
-        echo "BWA $(bwa 2>&1 | grep Version )" | tee BWA_VERSION
-        samtools --version | head -n1 | tee SAMTOOLS_VERSION
+        mkdir mapped_reads
+        for i in $(seq 0 $((${#read1_files[@]} - 1)))
+        do
+            bwa mem -t 4 ${reference_genome} ${read1_files[i]} ${read2_files[i]} | \
+            samtools sort -o mapped_reads/"${sample_names[i]}_sorted.bam"
+            samtools index mapped_reads/"${sample_names[i]}_sorted.bam"
+        done
+    >>>
 
-        bwa index "~{reference_genome_map}"
+    output {
+        File sorted_bams = glob("mapped_reads/*_sorted.bam")
+    }
 
-        # Map with BWA MEM
-        echo "Running bwa mem ${reference_genome_map} ~{read1} ~{read2} | samtools sort | samtools view -F 4 -o ~{file_label}.sorted.bam "
-        bwa mem \
-        "${reference_genome_map}" \
-        ~{read1} ~{read2} |\
-        samtools sort | samtools view -F 4 -o ~{file_label}.sorted.bam
-
-        # index BAMs
-        samtools index ~{file_label}.sorted.bam
-        >>>
-        output {
-            File sorted_bam = "${file_label}.sorted.bam"
-            File sorted_bai = "${file_label}.sorted.bam.bai"
-        }
-        runtime {
-            docker: "quay.io/staphb/ivar:1.3.1-titan"
-            memory: "32G"
-            disks: "local-disk 40 HDD"
-        }
+    runtime {
+        docker: "dukegcb/bwa-samtools"
+        memory: "32 GB"
+        cpu: "4"
+    }
 }

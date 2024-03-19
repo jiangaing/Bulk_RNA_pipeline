@@ -1,10 +1,10 @@
-version 1.0
+version 2.0
 
 task merge_count {
     # This concatenates the featureCounts count files into a 
     # raw count matrix.
     input {
-        File count_files
+        Array[File] count_files
         String file_label
     }
 
