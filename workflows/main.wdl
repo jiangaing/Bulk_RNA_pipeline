@@ -7,9 +7,9 @@ import "./tasks/feature_count.wdl" as Count
 
 workflow main {
     input {
-        Array[File] fastq_end1_files
-        Array[File] fastq_end2_files
-        Array[String] sample_names
+        File fastq_end1_files
+        File fastq_end2_files
+        String sample_names
         File reference_genome
         File annotated_reference
         File adapters_path
@@ -51,11 +51,11 @@ workflow main {
 
     # Outputs
     output {
-        Array[File] qc_report_htmls = pre_qc.qc_report_htmls
-        Array[File] qc_report_zips = pre_qc.qc_report_zips
-        Array[File] trimmed_reads_r1 = trim_read.r1_paired
-        Array[File] trimmed_reads_r2 = trim_read.r2_paired
-        Array[File] mapped_bams = map_read.sorted_bams
-        Array[File] count_files = feature_count.count_files
+        File qc_report_htmls = pre_qc.qc_report_htmls
+        File qc_report_zips = pre_qc.qc_report_zips
+        File trimmed_reads_r1 = trim_read.r1_paired
+        File trimmed_reads_r2 = trim_read.r2_paired
+        File mapped_bams = map_read.sorted_bams
+        File count_files = feature_count.count_files
     }
 }

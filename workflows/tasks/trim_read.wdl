@@ -2,9 +2,9 @@ version 1.0
 
 task trim_read {
     input {
-        Array[File] read1_files
-        Array[File] read2_files
-        Array[String] sample_names
+        File read1_files
+        File read2_files
+        String sample_names
         String adapters_path
         Int minlen = 75
     }
@@ -22,8 +22,8 @@ task trim_read {
     >>>
 
     output {
-        Array[File] r1_paired = glob("trimmed_reads/*_R1_paired.fastq.gz")
-        Array[File] r2_paired = glob("trimmed_reads/*_R2_paired.fastq.gz")
+        File r1_paired = glob("trimmed_reads/*_R1_paired.fastq.gz")
+        File r2_paired = glob("trimmed_reads/*_R2_paired.fastq.gz")
     }
 
     runtime {

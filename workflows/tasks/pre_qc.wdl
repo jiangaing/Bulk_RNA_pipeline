@@ -2,9 +2,9 @@ version 1.0
 
 task pre_qc {
     input {
-        Array[File] read1_files
-        Array[File] read2_files
-        Array[String] sample_names
+        File read1_files
+        File read2_files
+        String sample_names
     }
 
     command <<<
@@ -19,8 +19,8 @@ task pre_qc {
     >>>
 
     output {
-        Array[File] qc_report_htmls = glob("qc_reports/*_fastqc.html")
-        Array[File] qc_report_zips = glob("qc_reports/*_fastqc.zip")
+        File qc_report_htmls = glob("qc_reports/*_fastqc.html")
+        File qc_report_zips = glob("qc_reports/*_fastqc.zip")
     }
 
     runtime {

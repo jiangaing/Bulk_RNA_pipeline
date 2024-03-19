@@ -17,7 +17,7 @@ task feature_count {
     >>>
 
     output {
-        Array[File] count_files = glob("feature_counts/*_counts.txt")
+        File count_files = glob("feature_counts/*_counts.txt")
     }
 
     runtime {

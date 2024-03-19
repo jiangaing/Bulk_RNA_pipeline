@@ -19,7 +19,7 @@ task map_read {
     >>>
 
     output {
-        Array[File] sorted_bams = glob("mapped_reads/*_sorted.bam")
+        File sorted_bams = glob("mapped_reads/*_sorted.bam")
     }
 
     runtime {
